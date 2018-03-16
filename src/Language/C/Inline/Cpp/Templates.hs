@@ -88,9 +88,9 @@ instantiate temp typeParams = do
 
     otherChar = (:[]) <$> anyChar
 
-    patchExpr (AppE (AppE (ConE placeholderCons) (ConE placeholderTypeName)) (LitE (StringL blockStr)))
+    patchExpr :: Exp -> Q (Maybe Exp)
+    patchExpr (ConE placeholderCons `AppE` ConE placeholderTypeName `AppE` LitE (StringL blockStr))
       | placeholderCons == 'Placeholder = do
-        substitutedBlockStr <- substituteCTypes blockStr
         let quoterTypes =
               M.fromList
                 [ ( 'PTBlock, C.block )
@@ -100,8 +100,8 @@ instantiate temp typeParams = do
         quoter <- case M.lookup placeholderTypeName quoterTypes of
           Nothing -> fail "Invalid placeholder type."
           Just quoter -> return quoter
-        cExp <- quoteExp quoter substitutedBlockStr
-        return (Just cExp)
+        substitutedBlockStr <- substituteCTypes blockStr
+        Just <$> quoteExp quoter substitutedBlockStr
     patchExpr _ = return Nothing
 
   preDecs <- sequence (templatePreDecs temp)
