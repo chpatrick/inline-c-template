@@ -2,12 +2,14 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Main where
 
 import qualified Language.C.Inline.Cpp as C
 import qualified Language.C.Inline.Cpp.Templates as CT
 import qualified VectorTemplate as Vector
+import qualified MapTemplate as UnorderedMap
 import Data.Foldable
 
 import Language.Haskell.TH
@@ -20,6 +22,8 @@ C.context C.cppCtx
 CT.instantiate Vector.stdVectorTemplate [ ( "int", [t|CInt|] ) ]
 CT.instantiate Vector.stdVectorTemplate [ ( "float", [t|CFloat|] ) ]
 CT.instantiate Vector.stdVectorTemplate [ ( "void*", [t|Ptr ()|] ) ]
+
+CT.instantiate UnorderedMap.stdUnorderedMapTemplate [ ( "int", [t|CInt|] ), ( "float", [t|CFloat|] ) ]
 
 newtype BoxedVector a = BoxedVector (Vector.StdVector (Ptr ()))
 
@@ -58,3 +62,9 @@ main = do
   for_ [0..1] $ \ix -> do
     val <- atBoxed stringVector ix
     print val
+
+  intFloatMap <- UnorderedMap.new @CInt @CFloat
+  UnorderedMap.put intFloatMap 42 pi
+  UnorderedMap.put intFloatMap 666 (sqrt 2)
+  UnorderedMap.get intFloatMap 42 >>= print
+  UnorderedMap.get intFloatMap 666 >>= print

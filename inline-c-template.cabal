@@ -30,11 +30,12 @@ library
   default-language:    Haskell2010
   ghc-options:         -Wall
 
-test-suite vector-test
+test-suite stl-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
-  main-is:             VectorTest.hs
+  main-is:             StlTest.hs
   other-modules:       VectorTemplate
+                       MapTemplate
   build-depends:       base,
                        inline-c-template,
                        inline-c,
