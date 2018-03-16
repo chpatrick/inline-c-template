@@ -21,7 +21,7 @@ newtype StdVector a = StdVector (ForeignPtr ())
 class StdVectorImpl a where
   new :: IO (StdVector a)
   pushBack :: StdVector a -> a -> IO ()
-  index :: StdVector a -> Int -> IO a
+  at :: StdVector a -> Int -> IO a
 
 stdVectorTemplate :: CT.Template
 stdVectorTemplate = CT.Template
@@ -38,7 +38,7 @@ stdVectorTemplate = CT.Template
           reinterpret_cast<std::vector<@a>*>($(void* ptr))->push_back($(@a x));
         }|]
 
-      index (StdVector fptr) ix = withForeignPtr fptr $ \ptr -> do
+      at (StdVector fptr) ix = withForeignPtr fptr $ \ptr -> do
         let cIx = fromIntegral ix
         [CT.exp| @a {
           reinterpret_cast<std::vector<@a>*>($(void* ptr))->at($(int cIx))
