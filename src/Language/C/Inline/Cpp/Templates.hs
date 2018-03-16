@@ -65,7 +65,7 @@ instantiate temp typeParams = do
     _ -> fail "The template must be a single instance declaration."
   let instTypeVars = instType ^.. typeVarsEx mempty
   unless (length instTypeVars == length typeParams) $
-    fail "The number of type arguments must match the number of template type parameters."
+    fail ("Expected " ++ show (length instTypeVars) ++ " template parameter(s), got " ++ show (length typeParams))
 
   typeParamsHaskell <- for typeParams $ \( _, typeParam ) -> typeParam
   let typeSubstitution = M.fromList (zip instTypeVars typeParamsHaskell)
